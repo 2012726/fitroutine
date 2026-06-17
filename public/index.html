@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitRoutine - 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js CDN for visual analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">🔥</span>
+        <h2>FitRoutine</h2>
+      </div>
+      
+      <div class="user-profile">
+        <div class="user-avatar" id="avatar-letter">U</div>
+        <div class="user-info">
+          <span class="user-name" id="user-display-name">사용자</span>
+          <span class="user-role">피트니스 메이트</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+              <span class="nav-icon">📊</span> 대시보드 요약
+            </a>
+          </li>
+          <li>
+            <a href="#workouts" class="nav-link" data-tab="workouts">
+              <span class="nav-icon">💪</span> 운동 기록 관리
+            </a>
+          </li>
+          <li>
+            <a href="#meals" class="nav-link" data-tab="meals">
+              <span class="nav-icon">🥗</span> 식단 칼로리 관리
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/auth/logout" class="btn-logout">
+          <span class="nav-icon">🚪</span> 로그아웃
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <h1 id="page-title">대시보드</h1>
+        <div class="top-bar-actions">
+          <button id="btn-seed" class="btn btn-outline btn-sm">⚡ 데모 데이터 채우기</button>
+          <span class="current-date" id="today-date-display">2026-06-13</span>
+        </div>
+      </header>
+
+      <!-- Content Views -->
+      <div class="content-container">
+        
+        <!-- Tab 1: Dashboard View -->
+        <section id="tab-dashboard" class="tab-view active">
+          <!-- Summary Cards -->
+          <div class="dashboard-cards">
+            <div class="card card-neon-purple">
+              <div class="card-header">
+                <h3>오늘 섭취한 칼로리</h3>
+                <span class="card-icon">🥗</span>
+              </div>
+              <div class="card-body">
+                <span class="stat-number" id="stat-consumed">0</span>
+                <span class="stat-unit">kcal</span>
+              </div>
+            </div>
+
+            <div class="card card-neon-cyan">
+              <div class="card-header">
+                <h3>오늘 소모한 칼로리</h3>
+                <span class="card-icon">🔥</span>
+              </div>
+              <div class="card-body">
+                <span class="stat-number" id="stat-burned">0</span>
+                <span class="stat-unit">kcal</span>
+              </div>
+            </div>
+
+            <div class="card card-neon-green">
+              <div class="card-header">
+                <h3>순 칼로리 (섭취-소모)</h3>
+                <span class="card-icon">⚖️</span>
+              </div>
+              <div class="card-body">
+                <span class="stat-number" id="stat-net">0</span>
+                <span class="stat-unit">kcal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart and Nutrition Breakdowns -->
+          <div class="dashboard-grid">
+            <div class="grid-card chart-container-card">
+              <h3>주간 칼로리 추이 (최근 7일)</h3>
+              <div class="chart-wrapper">
+                <canvas id="weekly-calorie-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="grid-card macro-container-card">
+              <h3>오늘의 영양 정보</h3>
+              <div class="macro-list">
+                <div class="macro-item">
+                  <div class="macro-label">
+                    <span>탄수화물 (Carbs)</span>
+                    <span id="macro-carbs-val">0g</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill progress-carbs" id="macro-carbs-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="macro-item">
+                  <div class="macro-label">
+                    <span>단백질 (Protein)</span>
+                    <span id="macro-protein-val">0g</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill progress-protein" id="macro-protein-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="macro-item">
+                  <div class="macro-label">
+                    <span>지방 (Fat)</span>
+                    <span id="macro-fat-val">0g</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill progress-fat" id="macro-fat-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="macro-helper">
+                <p>💡 회원님만의 일일 목표 섭취량 기준(탄수화물 150g, 단백질 75g, 지방 50g)에 대비하여 차오르는 그래프입니다.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Workouts View -->
+        <section id="tab-workouts" class="tab-view">
+          <div class="management-grid">
+            <!-- Form to Add Workout -->
+            <div class="form-card glass-card">
+              <h3>🏋️ 새 운동 등록</h3>
+              <form id="workout-form">
+                <div class="form-group">
+                  <label for="workout-title">운동명</label>
+                  <input type="text" id="workout-title" placeholder="예: 30분 러닝머신, 스쿼트 등" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="workout-category">분류</label>
+                    <select id="workout-category" required>
+                      <option value="Cardio">유산소 (Cardio)</option>
+                      <option value="Strength">근력 운동 (Strength)</option>
+                      <option value="Flexibility">스트레칭/유연성 (Flexibility)</option>
+                      <option value="Other">기타 (Other)</option>
+                    </select>
+                  </div>
+                  <div class="form-group col">
+                    <label for="workout-duration">시간 (분)</label>
+                    <input type="number" id="workout-duration" min="1" placeholder="30" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="workout-calories">소모 칼로리 (kcal)</label>
+                    <input type="number" id="workout-calories" min="0" placeholder="250" required>
+                  </div>
+                  <div class="form-group col">
+                    <label for="workout-date">날짜 (선택)</label>
+                    <input type="date" id="workout-date">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-cyan btn-block">기록 저장</button>
+              </form>
+            </div>
+
+            <!-- List of Workouts -->
+            <div class="table-card glass-card">
+              <h3>📋 운동 기록 목록</h3>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>날짜</th>
+                      <th>운동명</th>
+                      <th>분류</th>
+                      <th>시간</th>
+                      <th>소모 칼로리</th>
+                      <th>작업</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workout-list-body">
+                    <!-- Dynamic Rows -->
+                    <tr>
+                      <td colspan="6" class="text-center">기록이 없습니다. 새로운 운동을 등록하세요!</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Meals View -->
+        <section id="tab-meals" class="tab-view">
+          <div class="management-grid">
+            <!-- Form to Add Meal -->
+            <div class="form-card glass-card">
+              <h3>🥑 새 식단 등록</h3>
+              <form id="meal-form">
+                <div class="form-group">
+                  <label for="meal-title">식단명</label>
+                  <input type="text" id="meal-title" placeholder="예: 닭가슴살 샐러드와 바나나" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="meal-type">식사 종류</label>
+                    <select id="meal-type" required>
+                      <option value="Breakfast">아침 (Breakfast)</option>
+                      <option value="Lunch">점심 (Lunch)</option>
+                      <option value="Dinner">저녁 (Dinner)</option>
+                      <option value="Snack">간식 (Snack)</option>
+                    </select>
+                  </div>
+                  <div class="form-group col">
+                    <label for="meal-calories">섭취 칼로리 (kcal)</label>
+                    <input type="number" id="meal-calories" min="0" placeholder="450" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-3">
+                    <label for="meal-protein">단백질 (g)</label>
+                    <input type="number" id="meal-protein" min="0" placeholder="25">
+                  </div>
+                  <div class="form-group col-3">
+                    <label for="meal-carbs">탄수화물 (g)</label>
+                    <input type="number" id="meal-carbs" min="0" placeholder="45">
+                  </div>
+                  <div class="form-group col-3">
+                    <label for="meal-fat">지방 (g)</label>
+                    <input type="number" id="meal-fat" min="0" placeholder="10">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="meal-date">날짜 (선택)</label>
+                  <input type="date" id="meal-date">
+                </div>
+                <button type="submit" class="btn btn-purple btn-block">식단 저장</button>
+              </form>
+            </div>
+
+            <!-- List of Meals -->
+            <div class="table-card glass-card">
+              <h3>📋 식단 기록 목록</h3>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>날짜</th>
+                      <th>식사명</th>
+                      <th>종류</th>
+                      <th>칼로리</th>
+                      <th>탄/단/지</th>
+                      <th>작업</th>
+                    </tr>
+                  </thead>
+                  <tbody id="meal-list-body">
+                    <!-- Dynamic Rows -->
+                    <tr>
+                      <td colspan="6" class="text-center">기록이 없습니다. 새로운 식단을 등록하세요!</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Client-side logic script -->
+  <script src="app.js"></script>
+</body>
+</html>

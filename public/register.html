@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitRoutine - 회원가입</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+  <div class="auth-container">
+    <div class="auth-glass-card">
+      <div class="brand-header">
+        <div class="brand-logo">🔥</div>
+        <h1>FitRoutine</h1>
+        <p>계정을 만들고 나만의 피트니스 기록을 시작해 보세요</p>
+      </div>
+
+      <form id="register-form" class="auth-form">
+        <div class="alert-message hidden" id="alert-box"></div>
+
+        <div class="form-group">
+          <label for="username">사용자 이름</label>
+          <input type="text" id="username" name="username" placeholder="홍길동" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="email">이메일 주소</label>
+          <input type="email" id="email" name="email" placeholder="example@email.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요 (6자 이상)" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" id="btn-register" class="btn btn-secondary btn-block">회원가입</button>
+      </form>
+
+      <div class="auth-footer">
+        이미 계정이 있으신가요? <a href="login.html">로그인</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple verification check to see if user is already logged in
+    fetch('/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/index.html';
+        }
+      })
+      .catch(() => {});
+
+    // Handle Form Submission via AJAX
+    const form = document.getElementById('register-form');
+    const alertBox = document.getElementById('alert-box');
+    const submitBtn = document.getElementById('btn-register');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Reset Alert
+      alertBox.className = 'alert-message hidden';
+      submitBtn.disabled = true;
+      submitBtn.innerText = '가입 처리 중...';
+
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (password.length < 6) {
+        alertBox.className = 'alert-message alert-danger';
+        alertBox.textContent = '비밀번호는 최소 6자 이상이어야 합니다.';
+        submitBtn.disabled = false;
+        submitBtn.innerText = '회원가입';
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          alertBox.className = 'alert-message alert-success';
+          alertBox.textContent = '회원가입이 완료되었습니다! 잠시 후 대시보드로 이동합니다.';
+          
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 1500);
+        } else {
+          alertBox.className = 'alert-message alert-danger';
+          alertBox.textContent = data.message || '회원가입에 실패했습니다. 다시 시도해 주세요.';
+          submitBtn.disabled = false;
+          submitBtn.innerText = '회원가입';
+        }
+      } catch (error) {
+        console.error('Registration Error:', error);
+        alertBox.className = 'alert-message alert-danger';
+        alertBox.textContent = '서버 연결에 실패했습니다. 나중에 다시 시도해 주세요.';
+        submitBtn.disabled = false;
+        submitBtn.innerText = '회원가입';
+      }
+    });
+  </script>
+</body>
+</html>
