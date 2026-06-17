@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 require('dotenv').config();
 
 let mongoServer = null;
@@ -24,6 +23,7 @@ const connectDB = async () => {
       console.log(`[Database] Starting in-memory MongoDB server fallback...`);
       
       try {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
         mongoServer = await MongoMemoryServer.create();
         const mongoUri = mongoServer.getUri();
         
